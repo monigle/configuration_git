@@ -1,0 +1,23 @@
+<?php
+/**
+ * Implements configuration_gitpost_help.
+ *
+ * Displays help and module information.
+ *
+ * @param path 
+ *   Which path of the site we're using to display help
+ * @param arg 
+ *   Array that holds the current path as returned from arg() function
+ */
+function configuration_gitpost_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#configuration_gitpost":
+      return '<p>'.  t("This is the first help from my new module") .'</p>';
+      break;
+  }
+}
+
+function configuration_git_after_configuration_write_exports($filename, $file_contents) {
+	
+	
+}
