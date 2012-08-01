@@ -1,0 +1,166 @@
+<?php
+
+// Git Add Command
+define('CONFIGURATION_GIT_STATUS', 'git status ');
+define('CONFIGURATION_GIT_ADD', 'git add -A ');
+define('CONFIGURATION_GIT_COMMIT', 'git commit -m \'Auto Generated\'');
+
+define('CONFIGURATION_GIT_WHOAMI', 'whoami ');
+
+define('CONFIGURATION_GIT_RESPOSITORY', '');
+define('CONFIGURATION_GIT_EMAIL', 'you@yourdomain.example.com');
+define('CONFIGURATION_GIT_NAME', 'Your Name Comes Here');
+
+/**
+ * Implements configuration_gitpost_help.
+ *
+ * Displays help and module information.
+ *
+ * @param path 
+ *   Which path of the site we're using to display help
+ * @param arg 
+ *   Array that holds the current path as returned from arg() function
+ */
+function configuration_git_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#configuration_gitpost":
+      return '<p>'.  t("This is the first help from my new module") .'</p>';
+      break;
+  }
+}
+
+
+/**
+ * Implements configuration_git_after_configuration_write_exports
+ *
+ * @param filename 
+ *	Complete path to the file that was written for configuration.
+ */
+function configuration_git_after_configuration_write_exports($filename) {
+	
+	configuration_git_add_file($filename);
+	
+	configuration_git_commit_file($filename);
+	
+}
+
+
+/**
+ * Implements configuration_git_add_file
+ *
+ * @param filename 
+ *	Complete path to the file that will be added to the repository.
+ */
+function configuration_git_add_file($filename) {
+	
+	$return_var = 0;
+	$output = array();
+	
+	$command = CONFIGURATION_GIT_ADD . $filename;
+	exec($command . ' 2>&1', $output, $return_var);
+	if ($return_var!=0)
+	{
+		// TODO check to see if this is correct using platform name
+		$result = getcwd();
+		// TODO check to see if this is correct using platform name
+	
+	}
+}
+
+
+/**
+ * Implements configuration_git_commit_file
+ *
+ * @param filename 
+ *	Complete path to the file that will be commited to the repository.
+ */
+function configuration_git_commit_file($filename) {
+	
+	$return_var = 0;
+	$output = array();
+	
+	$command = CONFIGURATION_GIT_COMMIT . $filename;
+	exec($command . ' 2>&1', $output, $return_var);
+	if ($return_var!=0)
+	{
+		// TODO error handliyng
+	
+	}
+}
+
+/**
+ * Implements configuration_git_add_file
+ *
+ * @param filename 
+ *	Complete path to the file that will be added to the repository.
+ */
+function configuration_git_status() {
+	
+	$status = false;
+	
+	$return_var = 0;
+	$output = array();
+	
+	$command = CONFIGURATION_GIT_STATUS . $filename;
+	exec($command . ' 2>&1', $output, $return_var);
+	if ($return_var!=0)
+	{
+		// TODO error handliyng
+	
+	}
+}
+
+/**
+ * Implements hook_menu().
+ */
+function configuration_git_menu() {
+  $items = array();
+
+  $items['admin/config/system/configuration_git'] = array(
+    'title' => 'Configuration git',
+    'description' => 'Configuration for Configuration git',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('configuration_git_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback: Current posts settings
+ *
+ * @see configuration_git_menu()
+ */
+function configuration_git_form($form, &$form_state) {
+  $form['configuration_git_repository'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Platform git Respository'),
+    '#default_value' => variable_get('configuration_git_repository', CONFIGURATION_GIT_RESPOSITORY),
+    '#size' => 64,
+    '#maxlength' => 254,
+    '#description' => t('Enter the Git Repository Location Here (https://, Leave blank for local only.)'),
+    '#required' => FALSE,
+  );
+  $form['configuration_git_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Platform git Name'),
+    '#default_value' => variable_get('configuration_git_name', CONFIGURATION_GIT_NAME),
+    '#size' => 64,
+    '#maxlength' => 254,
+    '#description' => t('Enter the Git Repository Default Name Address (.gitconfig)'),
+    '#required' => FALSE,
+  );
+  $form['configuration_git_email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Platform git Email'),
+    '#default_value' => variable_get('configuration_git_email', CONFIGURATION_GIT_EMAIL),
+    '#size' => 64,
+    '#maxlength' => 254,
+    '#description' => t('Enter the Git Repository Default Email Address (.gitconfig)'),
+    '#required' => FALSE,
+  );
+
+  return system_settings_form($form);
+}

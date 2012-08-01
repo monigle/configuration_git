@@ -1,7 +1,8 @@
 name = Configuration Git Post 
 description = Provide hooks and methods for integrating GitHub with Drupal Configuration, etc...
 core = 7.x
-package = "Configuration"
+package = Configuration
 dependencies[] = configuration
 php = 5.3
 version = "7.x-1.x-dev"
+configure = admin/config/system/configuration_git
