@@ -1,15 +1,25 @@
 <?php
 
-// Git Add Command
+// Git Command specific
 define('CONFIGURATION_GIT_STATUS', 'git status ');
 define('CONFIGURATION_GIT_ADD', 'git add -A ');
-define('CONFIGURATION_GIT_COMMIT', 'git commit -m \'Auto Generated\'');
+define('CONFIGURATION_GIT_COMMIT', 'git commit -m \'Auto Generated\''); // --author
+define('CONFIGURATION_GIT_INIT', 'git init --shared=all ');
+define('CONFIGURATION_GIT_REMOTE', 'git remote add origin ');
 
-define('CONFIGURATION_GIT_WHOAMI', 'whoami ');
-
+// Git Environment Specific
 define('CONFIGURATION_GIT_RESPOSITORY', '');
 define('CONFIGURATION_GIT_EMAIL', 'you@yourdomain.example.com');
 define('CONFIGURATION_GIT_NAME', 'Your Name Comes Here');
+
+// Git Response / Error Specific
+define('CONFIGURATION_GIT_STATUS_NOREPO', 'Not a git repository');
+define('CONFIGURATION_GIT_CODE_NOREPO', 128);
+define('CONFIGURATION_GIT_STATUS_REMOTEEXISTS', 'remote origin already exists');
+
+// OS Specific / Testing
+define('CONFIGURATION_GIT_STDOUT',' 2>&1');
+define('CONFIGURATION_GIT_WHOAMI', 'whoami ');
 
 /**
  * Implements configuration_gitpost_help.
@@ -44,7 +54,6 @@ function configuration_git_after_configuration_write_exports($filename) {
 	
 }
 
-
 /**
  * Implements configuration_git_add_file
  *
@@ -57,7 +66,9 @@ function configuration_git_add_file($filename) {
 	$output = array();
 	
 	$command = CONFIGURATION_GIT_ADD . $filename;
-	exec($command . ' 2>&1', $output, $return_var);
+	ob_start();
+	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
 	if ($return_var!=0)
 	{
 		// TODO check to see if this is correct using platform name
@@ -66,7 +77,6 @@ function configuration_git_add_file($filename) {
 	
 	}
 }
-
 
 /**
  * Implements configuration_git_commit_file
@@ -80,7 +90,9 @@ function configuration_git_commit_file($filename) {
 	$output = array();
 	
 	$command = CONFIGURATION_GIT_COMMIT . $filename;
-	exec($command . ' 2>&1', $output, $return_var);
+	ob_start();
+	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
 	if ($return_var!=0)
 	{
 		// TODO error handliyng
@@ -89,25 +101,88 @@ function configuration_git_commit_file($filename) {
 }
 
 /**
- * Implements configuration_git_add_file
+ * Implements configuration_git_status
  *
  * @param filename 
  *	Complete path to the file that will be added to the repository.
  */
 function configuration_git_status() {
+	$return_var = 0;
+	$output = array();
+	$result = array();
 	
-	$status = false;
+	$command = CONFIGURATION_GIT_STATUS;
+	ob_start();
+	@exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
+	$result['return_var'] = $return_var;
+	$result['output'] = $output;
+	$result['buffer'] = $buffer;
+	
+	if ($result['return_var']==CONFIGURATION_GIT_CODE_NOREPO)
+	{
+		$result = configuration_git_init();
+//		ob_start();
+//		@exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+//		$buffer = ob_get_clean();
+//		$result['return_var'] = $return_var;
+//		$result['output'] = $output;
+//		$result['buffer'] = $buffer;
+	}
+	return $result;
+}
+
+/**
+ * Implements configuration_git_status
+ *
+ * @param filename 
+ *	Complete path to the file that will be added to the repository.
+ */
+function configuration_git_init() {
 	
 	$return_var = 0;
 	$output = array();
+	$result = array();
 	
-	$command = CONFIGURATION_GIT_STATUS . $filename;
-	exec($command . ' 2>&1', $output, $return_var);
-	if ($return_var!=0)
-	{
-		// TODO error handliyng
+	$command = CONFIGURATION_GIT_INIT;
+	ob_start();
+	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
+	$result['return_var'] = $return_var;
+	$result['output'] = $output;
+	$result['buffer'] = $buffer;
 	
-	}
+	// passing results, dummy method
+	return $result;
+}
+
+/**
+ * Implements configuration_git_status
+ *
+ * @param url 
+ *	Complete path to the repository if other than Drupal variable
+ */
+function configuration_git_remote($url='') {
+	
+	$return_var = 0;
+	$output = array();
+	$result = array();
+	
+	if ($url)
+		variable_set('configuration_git_repository', $url);
+	else
+		$url = variable_get('configuration_git_repository', CONFIGURATION_GIT_RESPOSITORY);
+	
+	$command = CONFIGURATION_GIT_REMOTE . $url;
+	ob_start();
+	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
+	$result['return_var'] = $return_var;
+	$result['output'] = $output;
+	$result['buffer'] = $buffer;
+	
+	// passing results, dummy method
+	return $result;
 }
 
 /**
@@ -150,7 +225,7 @@ function configuration_git_form($form, &$form_state) {
     '#size' => 64,
     '#maxlength' => 254,
     '#description' => t('Enter the Git Repository Default Name Address (.gitconfig)'),
-    '#required' => FALSE,
+    '#required' => TRUE,
   );
   $form['configuration_git_email'] = array(
     '#type' => 'textfield',
@@ -159,8 +234,44 @@ function configuration_git_form($form, &$form_state) {
     '#size' => 64,
     '#maxlength' => 254,
     '#description' => t('Enter the Git Repository Default Email Address (.gitconfig)'),
-    '#required' => FALSE,
+    '#required' => TRUE,
   );
 
   return system_settings_form($form);
+}
+
+/**
+ * Implements validation from the Form API.
+ * 
+ * @param $form
+ *   A structured array containing the elements and properties of the form.
+ * @param $form_state
+ *   An array that stores information about the form's current state 
+ *   during processing.
+ */
+function configuration_git_form_validate($form, &$form_state){
+  $configuration_git_repository = $form_state['values']['configuration_git_repository'];
+  $configuration_git_name = $form_state['values']['configuration_git_name'];
+  $configuration_git_email = $form_state['values']['configuration_git_email'];
+  // TODO etc
+  if (false){
+    form_set_error('configuration_git_repository', t('message configuration_git_repository'));
+  }
+  if (false){
+    form_set_error('configuration_git_name', t('message configuration_git_name'));
+  }
+  if (false){
+    form_set_error('configuration_git_email', t('message configuration_git_email'));
+  }
+  
+  $status = configuration_git_status();
+  if ($status['return_var'])
+	form_set_error('configuration_git_repository', t(implode('\n',$status['output'])));
+  
+  $status = configuration_git_remote();
+  if ($status['return_var'])
+	  if (!stripos(implode(' ',$status['output']), CONFIGURATION_GIT_STATUS_REMOTEEXISTS))
+		form_set_error('configuration_git_repository', t($status['return_var'].':'.implode('\n',$status['output'])));
+  
+  
 }
