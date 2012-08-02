@@ -127,8 +127,7 @@ function configuration_git_admin_config_system_form_validate($form, &$form_state
   $configuration_git_name = $form_state['values']['configuration_git_name'];
   $configuration_git_email = $form_state['values']['configuration_git_email'];
   
-  if (!(valid_url($configuration_git_repository, TRUE))) {
-	// TODO validate is a good git url
+  if (($configuration_git_repository)&&!(valid_url($configuration_git_repository, TRUE))) {
     form_set_error('configuration_git_repository', t('Put a valid Git Url Here (https://)'));
   }
   if (!$configuration_git_name){
