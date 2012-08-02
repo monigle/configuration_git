@@ -126,15 +126,16 @@ function configuration_git_admin_config_system_form_validate($form, &$form_state
   $configuration_git_repository = $form_state['values']['configuration_git_repository'];
   $configuration_git_name = $form_state['values']['configuration_git_name'];
   $configuration_git_email = $form_state['values']['configuration_git_email'];
-  // TODO etc
-  if (false){
-    form_set_error('configuration_git_repository', t('message configuration_git_repository'));
+  
+  if (!(valid_url($configuration_git_repository, TRUE))) {
+	// TODO validate is a good git url
+    form_set_error('configuration_git_repository', t('Put a valid Git Url Here (https://)'));
   }
-  if (false){
-    form_set_error('configuration_git_name', t('message configuration_git_name'));
+  if (!$configuration_git_name){
+    form_set_error('configuration_git_name', t('Put anything here, make your mark. X will do.'));
   }
-  if (false){
-    form_set_error('configuration_git_email', t('message configuration_git_email'));
+  if (!valid_email_address($configuration_git_email)){
+    form_set_error('configuration_git_email', t('C\'mon man, your an admin right? Yu know what an email looks like?'));
   }
   
   $status = configuration_git_status();
@@ -184,6 +185,11 @@ function configuration_git_commit_form($form, &$form_state) {
   return $form;
 }
 
+/**
+ *	Re Implements live_css_save() to include git commits
+ * 
+ * @global string base_url 
+ */
 function configuration_git_live_css_save() {
 	$css = $_POST['css'];
 	$href = $_POST['href'];
@@ -197,6 +203,7 @@ function configuration_git_live_css_save() {
 	$stripped_url = drupal_substr($sanitized_url, drupal_strlen($base_url) , drupal_strlen($sanitized_url));
 	$filename = _live_css_document_root() . $stripped_url; 
 
+	// and boom goes the dynamite
 	ob_start();
 	live_css_save();
 	$json_buffer = ob_get_clean();
@@ -214,6 +221,7 @@ function configuration_git_live_css_save() {
   
 	echo $json_buffer;
 }
+
 /**
  * Implements configuration_git_after_configuration_write_exports
  *
