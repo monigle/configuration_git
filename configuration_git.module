@@ -140,7 +140,7 @@ function configuration_git_status() {
 	
 	if ($result['return_var']==CONFIGURATION_GIT_CODE_NOREPO)
 	{
-		$result = configuration_git_init();
+		$result = configuration_git_repo_init();
 //		ob_start();
 //		@exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
 //		$buffer = ob_get_clean();
@@ -157,7 +157,7 @@ function configuration_git_status() {
  * @param filename 
  *	Complete path to the file that will be added to the repository.
  */
-function configuration_git_init() {
+function configuration_git_repo_init() {
 	
 	$return_var = 0;
 	$output = array();
