@@ -197,7 +197,9 @@ function configuration_git_live_css_save() {
 	$stripped_url = drupal_substr($sanitized_url, drupal_strlen($base_url) , drupal_strlen($sanitized_url));
 	$filename = _live_css_document_root() . $stripped_url; 
 
+	ob_start();
 	live_css_save();
+	$json_buffer = ob_get_clean();
 	
 	$status = configuration_git_add_file($filename);
 	if ($status['return_var'])
@@ -210,7 +212,7 @@ function configuration_git_live_css_save() {
 	else
 		drupal_set_message(t('Committed %file to git repo', array('%file' => $filename)));
   
-  
+	echo $json_buffer;
 }
 /**
  * Implements configuration_git_after_configuration_write_exports
