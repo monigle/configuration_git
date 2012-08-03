@@ -71,6 +71,16 @@ function configuration_git_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   
+  $items['admin/config/system/configuration_git/status'] = array(
+    'title' => 'Status',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('configuration_git_status_form'),
+    'access arguments' => array('access configuration management'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'configuration.admin.inc',
+    'weight' => 7,
+  );
+  
   if (module_exists(LIVE_CSS))
   {
 	$items['css/save'] = array(
