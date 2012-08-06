@@ -11,7 +11,7 @@ define('CONFIGURATION_GIT_COMMIT_ALL', 'git commit -a -m \'%s\''); // --author
 define('CONFIGURATION_GIT_INIT', 'git init --shared=all ');
 define('CONFIGURATION_GIT_REMOTE', 'git remote add %s ');
 define('CONFIGURATION_GIT_PULL', 'git pull $s ');
-define('CONFIGURATION_GIT_PUSH', 'git pull $s ');
+define('CONFIGURATION_GIT_PUSH', 'git push %s %s ');
 
 // Git Environment Specific
 define('CONFIGURATION_GIT_RESPOSITORY', '');
@@ -69,8 +69,8 @@ function configuration_git_menu() {
   
   $items['admin/config/system/configuration_git/config'] = array(
     'title' => 'Configuration',
-    'weight' => -1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
   );
   
   $items['admin/config/system/configuration_git/status'] = array(
@@ -78,7 +78,7 @@ function configuration_git_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('configuration_git_status_form'),
     'access arguments' => array('access configuration management'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'configuration_git.admin.inc',
     'weight' => 1,
   );
@@ -269,8 +269,6 @@ function configuration_git_commit_all() {
 /**
  * Implements configuration_git_push
  *
- * @param filename 
- *	Complete path to the file that will be commited to the repository.
  */
 function configuration_git_push() {
 	global $user;
@@ -278,10 +276,12 @@ function configuration_git_push() {
 	$result = array();
 	$output = array();
 	
+	$remote = variable_get('configuration_git_remotename', CONFIGURATION_GIT_REMOTENAME);
+	$branch = variable_get('configuration_git_branch', CONFIGURATION_GIT_BRANCH);
 	if ($user->mail)
-		$command = sprintf(CONFIGURATION_GIT_COMMIT_ALL,$user->mail);
+		$command = sprintf(CONFIGURATION_GIT_PUSH,$remote,$branch);
 	else
-		$command = sprintf(CONFIGURATION_GIT_COMMIT_ALL,variable_get('configuration_git_email', CONFIGURATION_GIT_EMAIL));
+		$command = sprintf(CONFIGURATION_GIT_PUSH,$remote,$branch);
 				
 	ob_start();
 	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
