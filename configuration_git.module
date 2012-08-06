@@ -7,9 +7,11 @@ define('CONFIGURATION_GIT_ADD', 'git add ');
 // Not Atomic
 //define('CONFIGURATION_GIT_ADD', 'git add -A ');
 define('CONFIGURATION_GIT_COMMIT', 'git commit -m \'%s\''); // --author
+define('CONFIGURATION_GIT_COMMIT_ALL', 'git commit -a -m \'%s\''); // --author
 define('CONFIGURATION_GIT_INIT', 'git init --shared=all ');
-define('CONFIGURATION_GIT_REMOTE', 'git remote add origin ');
-define('CONFIGURATION_GIT_PULL', 'git pull origin ');
+define('CONFIGURATION_GIT_REMOTE', 'git remote add %s ');
+define('CONFIGURATION_GIT_PULL', 'git pull $s ');
+define('CONFIGURATION_GIT_PUSH', 'git pull $s ');
 
 // Git Environment Specific
 define('CONFIGURATION_GIT_RESPOSITORY', '');
@@ -219,12 +221,68 @@ function configuration_git_add_file($filename) {
 function configuration_git_commit_file($filename) {
 	global $user;
 	$return_var = 0;
+	$result = array();
 	$output = array();
 	
 	if ($user->mail)
 		$command = sprintf(CONFIGURATION_GIT_COMMIT,$user->mail) . $filename;
 	else
 		$command = sprintf(CONFIGURATION_GIT_COMMIT,variable_get('configuration_git_email', CONFIGURATION_GIT_EMAIL)) . $filename;
+		
+	ob_start();
+	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
+	$result['return_var'] = $return_var;
+	$result['output'] = $output;
+	$result['buffer'] = $buffer;
+	
+	// passing results, dummy method
+	return $result;
+}
+
+/**
+ * Implements configuration_git_commit_all
+ *
+ */
+function configuration_git_commit_all() {
+	global $user;
+	$return_var = 0;
+	$result = array();
+	$output = array();
+	
+	if ($user->mail)
+		$command = sprintf(CONFIGURATION_GIT_COMMIT_ALL,$user->mail);
+	else
+		$command = sprintf(CONFIGURATION_GIT_COMMIT_ALL,variable_get('configuration_git_email', CONFIGURATION_GIT_EMAIL));
+				
+	ob_start();
+	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
+	$buffer = ob_get_clean();
+	$result['return_var'] = $return_var;
+	$result['output'] = $output;
+	$result['buffer'] = $buffer;
+	
+	// passing results, dummy method
+	return $result;
+}
+
+/**
+ * Implements configuration_git_push
+ *
+ * @param filename 
+ *	Complete path to the file that will be commited to the repository.
+ */
+function configuration_git_push() {
+	global $user;
+	$return_var = 0;
+	$result = array();
+	$output = array();
+	
+	if ($user->mail)
+		$command = sprintf(CONFIGURATION_GIT_COMMIT_ALL,$user->mail);
+	else
+		$command = sprintf(CONFIGURATION_GIT_COMMIT_ALL,variable_get('configuration_git_email', CONFIGURATION_GIT_EMAIL));
+				
 	ob_start();
 	exec($command . CONFIGURATION_GIT_STDOUT, $output, $return_var);
 	$buffer = ob_get_clean();

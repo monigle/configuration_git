@@ -148,18 +148,8 @@ function configuration_git_status_form($form, &$form_state) {
  * Submit handler for commit clean up.
  */
 function configuration_git_commit_all_submit($form, &$form_state) {
-  // Values are saved for each page.
-  // to carry forward to subsequent pages in the form.
-  // and we tell FAPI to rebuild the form.
-//  $form_state['page_values'][1] = $form_state['values'];
-//
-//  if (!empty($form_state['page_values'][2])) {
-//    $form_state['values'] = $form_state['page_values'][2];
-//  }
-//
-//  // Only when click the "Stop Tracking" button, we move to the step two.
-//  $form_state['page_num'] = 2;
-//  $form_state['rebuild'] = TRUE;
+
+	$result = configuration_git_commit_all();
 }
 
 /**
