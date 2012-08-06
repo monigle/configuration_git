@@ -120,6 +120,62 @@ function configuration_git_status_form($form, &$form_state) {
 	'#prefix' => '<div>',
 	'#suffix' => '</div>',
 	);
+	
+	$form['status_text'] = array(
+	'#markup' => str_ireplace('\n','<br />',implode('<br />',$result['output'])),
+	'#prefix' => '<div>',
+	'#suffix' => '</div>',
+	);
+
+	$form['buttons']['commit_changes'] = array(
+	'#type' => 'submit',
+	'#value' => t('Commit Changes'),
+	'#weight' => 20,
+	'#submit' => array('configuration_git_commit_all_submit'),
+	);
+
+	$form['buttons']['push_changes'] = array(
+	'#type' => 'submit',
+	'#value' => t('Push Changes'),
+	'#weight' => 20,
+	'#submit' => array('configuration_git_push_all_submit'),
+	);
 
 	return $form;
+}
+
+/**
+ * Submit handler for commit clean up.
+ */
+function configuration_git_commit_all_submit($form, &$form_state) {
+  // Values are saved for each page.
+  // to carry forward to subsequent pages in the form.
+  // and we tell FAPI to rebuild the form.
+//  $form_state['page_values'][1] = $form_state['values'];
+//
+//  if (!empty($form_state['page_values'][2])) {
+//    $form_state['values'] = $form_state['page_values'][2];
+//  }
+//
+//  // Only when click the "Stop Tracking" button, we move to the step two.
+//  $form_state['page_num'] = 2;
+//  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Submit handler for commit clean up.
+ */
+function configuration_git_push_all_submit($form, &$form_state) {
+  // Values are saved for each page.
+  // to carry forward to subsequent pages in the form.
+  // and we tell FAPI to rebuild the form.
+//  $form_state['page_values'][1] = $form_state['values'];
+//
+//  if (!empty($form_state['page_values'][2])) {
+//    $form_state['values'] = $form_state['page_values'][2];
+//  }
+//
+//  // Only when click the "Stop Tracking" button, we move to the step two.
+//  $form_state['page_num'] = 2;
+//  $form_state['rebuild'] = TRUE;
 }
