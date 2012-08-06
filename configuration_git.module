@@ -77,7 +77,7 @@ function configuration_git_menu() {
     'page arguments' => array('configuration_git_status_form'),
     'access arguments' => array('access configuration management'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'configuration.admin.inc',
+    'file' => 'configuration_git.admin.inc',
     'weight' => 1,
   );
   
