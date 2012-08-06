@@ -78,7 +78,7 @@ function configuration_git_menu() {
     'access arguments' => array('access configuration management'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'configuration.admin.inc',
-    'weight' => 7,
+    'weight' => 1,
   );
   
   if (module_exists(LIVE_CSS))
