@@ -116,7 +116,7 @@ function configuration_git_status_form($form, &$form_state) {
 	
 	$result = configuration_git_status();
 	$form['status_text'] = array(
-	'#markup' => str_ireplace('\n','<br />',$result['output']),
+	'#markup' => str_ireplace('\n','<br />',implode('<br />',$result['output'])),
 	'#prefix' => '<div>',
 	'#suffix' => '</div>',
 	);
