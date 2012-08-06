@@ -97,8 +97,6 @@ function configuration_git_admin_config_system_form_validate($form, &$form_state
   
 }
 
-
-
 /**
  * Administrative form
  *
@@ -109,14 +107,19 @@ function configuration_git_admin_config_system_form_validate($form, &$form_state
  */
 function configuration_git_status_form($form, &$form_state) {
 	
-  $form['configuration_git_branch'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Platform git Remote Status'),
-    '#default_value' => variable_get('configuration_git_status', CONFIGURATION_GIT_BRANCH),
-    '#size' => 32,
-    '#maxlength' => 64,
-    '#description' => t('Enter the Git Repository Default Status (.gitconfig)'),
-    '#required' => TRUE,
-  );
+	configuration_git_status();
+	$form['help_text'] = array(
+	'#markup' => 'Below is the status from the current Git repository.',
+	'#prefix' => '<div>',
+	'#suffix' => '</div>',
+	);
+	
+	$result = configuration_git_status();
+	$form['status_text'] = array(
+	'#markup' => str_ireplace('\n','<br />',$result['output']),
+	'#prefix' => '<div>',
+	'#suffix' => '</div>',
+	);
 
+	return $form;
 }
