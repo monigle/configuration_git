@@ -69,9 +69,33 @@ function configuration_git_config_form($form, &$form_state) {
  *   during processing.
  */
 function configuration_git_admin_config_system_form_validate($form, &$form_state){
+  $form_variables = array('configuration_git_repository','configuration_git_name','configuration_git_email','configuration_git_remotename','configuration_git_branch');
+  
+  foreach($form_variables AS $var)
+  {
+    switch ($var) {
+      case 'configuration_git_repository':
+        if (($form_state['values'][$var])&&!(valid_url($form_state['values'][$var], TRUE))) {
+          form_set_error($var, t('Put a valid Git Url Here (https://)'));
+        }
+        break;
+      case 'configuration_git_email':
+        if (!valid_email_address($configuration_git_email)){
+          form_set_error('configuration_git_email', t('C\'mon man, your an admin right? Yu know what an email looks like?'));
+        }
+        break;
+      default:
+        if (!$form_state['values'][$var]) {
+          form_set_error($form_state['values'][$var], t('Put anything here, make your mark. X will do.'));
+        }
+        break;
+    }
+  }
   $configuration_git_repository = $form_state['values']['configuration_git_repository'];
   $configuration_git_name = $form_state['values']['configuration_git_name'];
   $configuration_git_email = $form_state['values']['configuration_git_email'];
+  $configuration_git_remotename = $form_state['values']['configuration_git_remotename'];
+  $configuration_git_branch = $form_state['values']['configuration_git_branch'];
   
   if (($configuration_git_repository)&&!(valid_url($configuration_git_repository, TRUE))) {
     form_set_error('configuration_git_repository', t('Put a valid Git Url Here (https://)'));
@@ -86,7 +110,7 @@ function configuration_git_admin_config_system_form_validate($form, &$form_state
   $status = configuration_git_status();
   if ($status['return_var'])
   {
-	form_set_error('configuration_git_repository', t(implode('\n',$status['output'])));
+    form_set_error('configuration_git_repository', t(implode('\n',$status['output'])));
   }
   
   $status = configuration_git_remote();
@@ -94,7 +118,7 @@ function configuration_git_admin_config_system_form_validate($form, &$form_state
 	  if (!stripos(implode(' ',$status['output']), CONFIGURATION_GIT_STATUS_REMOTEEXISTS))
 		form_set_error('configuration_git_repository', t($status['return_var'].':'.implode('\n',$status['output'])));
   
-  
+  configuration_check_configuration_variables($identifier);
 }
 
 /**
